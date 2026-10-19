@@ -1,0 +1,11 @@
+<div class="card mb-3">
+    <div class="card-body">
+        <h4 class="card-title"><a href="{{ post.get_absolute_url }}" class="text-decoration-none">{{ post.title }}</a></h4>
+        <p class="card-text">{{ post.text|truncatewords:30 }}</p>
+        <small class="text-muted">
+            {{ post.author.username }} · {{ post.created_at|date:"d.m.Y H:i" }}
+            {% if post.category %}· {{ post.category.name }}{% endif %}
+            · 👁 {{ post.views }} · 💬 {{ post.comment_count }}
+        </small>
+    </div>
+</div>

@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="card">
+    <div class="card-body">
+        <h2>{% if object %}Postni tahrirlash{% else %}Yangi post{% endif %}</h2>
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button class="btn btn-primary" type="submit">Saqlash</button>
+            <a class="btn btn-secondary" href="{% if object %}{{ object.get_absolute_url }}{% else %}{% url 'post_list' %}{% endif %}">Bekor qilish</a>
+        </form>
+    </div>
+</div>
+{% endblock %}
