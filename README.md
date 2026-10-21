@@ -2,6 +2,13 @@
 
 Django'da yozilgan to'liq blog sayti: ro'yxatdan o'tish, kirish, post yozish, izoh qoldirish, qidiruv va kategoriyalar.
 
+## Quick start
+
+```bash
+make run     # creates .venv and .env, installs deps, starts the app
+make test    # checks + tests
+```
+
 ## Imkoniyatlar
 
 - Ro'yxatdan o'tish, kirish, chiqish (`accounts` app)
