@@ -4,7 +4,7 @@
 <h2 class="mb-4">Mening postlarim</h2>
 {% for post in posts %}
     {% include 'blog/post_card.html' %}
-{% empty %}
-    <p class="text-muted">Siz hali post yozmagansiz. <a href="{% url 'post_create' %}">Birinchi postni yozing</a></p>
+{% else %}
+    <p class="text-muted">Siz hali post yozmagansiz. <a href="{{ url('post_create') }}">Birinchi postni yozing</a></p>
 {% endfor %}
 {% endblock %}

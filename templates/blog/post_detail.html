@@ -7,14 +7,14 @@
     <div class="card-body">
         <h1>{{ post.title }}</h1>
         <p class="text-muted">
-            {{ post.author.username }} · {{ post.created_at|date:"d.m.Y H:i" }}
+            {{ post.author.username }} · {{ post.created_at|date("d.m.Y H:i") }}
             {% if post.category %}· {{ post.category.name }}{% endif %}
             · 👁 {{ post.views }}
         </p>
         <p>{{ post.text|linebreaks }}</p>
-        {% if user == post.author %}
-            <a class="btn btn-warning btn-sm" href="{% url 'post_update' post.pk %}">Tahrirlash</a>
-            <a class="btn btn-danger btn-sm" href="{% url 'post_delete' post.pk %}">O'chirish</a>
+        {% if request.user == post.author %}
+            <a class="btn btn-warning btn-sm" href="{{ url('post_update', args=[post.pk]) }}">Tahrirlash</a>
+            <a class="btn btn-danger btn-sm" href="{{ url('post_delete', args=[post.pk]) }}">O'chirish</a>
         {% endif %}
     </div>
 </div>
@@ -24,21 +24,21 @@
     <div class="card mb-2">
         <div class="card-body py-2">
             <strong>{{ comment.author.username }}</strong>
-            <small class="text-muted">{{ comment.created_at|date:"d.m.Y H:i" }}</small>
+            <small class="text-muted">{{ comment.created_at|date("d.m.Y H:i") }}</small>
             <p class="mb-0">{{ comment.text }}</p>
         </div>
     </div>
-{% empty %}
+{% else %}
     <p class="text-muted">Hali izoh yo'q.</p>
 {% endfor %}
 
-{% if user.is_authenticated %}
+{% if request.user.is_authenticated %}
     <form method="post" class="mt-3">
-        {% csrf_token %}
-        {{ form.as_p }}
+        {{ csrf_input }}
+        {{ form.as_p() }}
         <button class="btn btn-primary" type="submit">Yuborish</button>
     </form>
 {% else %}
-    <p class="mt-3"><a href="{% url 'login' %}?next={{ request.path }}">Kiring</a>, izoh qoldirish uchun.</p>
+    <p class="mt-3"><a href="{{ url('login') }}?next={{ request.path }}">Kiring</a>, izoh qoldirish uchun.</p>
 {% endif %}
 {% endblock %}

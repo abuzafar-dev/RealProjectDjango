@@ -21,7 +21,8 @@ class BlogTests(TestCase):
     def test_filter_by_category(self):
         Post.objects.create(author=self.author, title='Kategoriyasiz', text='Matn')
         response = self.client.get(reverse('post_list'), {'category': 'python'})
-        self.assertEqual(len(response.context['posts']), 1)
+        self.assertContains(response, 'Django asoslari')
+        self.assertNotContains(response, 'Kategoriyasiz')
 
     def test_detail_increases_views(self):
         self.client.get(reverse('post_detail', args=[self.post.pk]))
@@ -60,3 +61,22 @@ class BlogTests(TestCase):
         self.client.force_login(self.other)
         response = self.client.get(reverse('my_posts'))
         self.assertNotContains(response, 'Django asoslari')
+
+    def test_pages_render_with_jinja(self):
+        for i in range(6):
+            Post.objects.create(author=self.author, title=f'Post {i}', text='Matn')
+        self.assertContains(self.client.get(reverse('login')), 'Parol')
+        self.assertContains(self.client.get(reverse('register')), "Ro'yxatdan o'tish")
+        self.client.force_login(self.author)
+        pages = [
+            (reverse('post_list'), 'Keyingi'),
+            (reverse('post_detail', args=[self.post.pk]), 'Tahrirlash'),
+            (reverse('post_create'), 'Yangi post'),
+            (reverse('post_update', args=[self.post.pk]), 'Postni tahrirlash'),
+            (reverse('post_delete', args=[self.post.pk]), "o'chirasizmi"),
+            (reverse('my_posts'), 'Django asoslari'),
+        ]
+        for url, text in pages:
+            response = self.client.get(url)
+            self.assertContains(response, text)
+            self.assertContains(response, 'csrfmiddlewaretoken')

@@ -4,25 +4,25 @@
 <div class="row">
     <div class="col-md-8">
         <form class="d-flex mb-4" method="get">
-            <input class="form-control me-2" type="search" name="q" value="{{ request.GET.q }}" placeholder="Qidirish...">
+            <input class="form-control me-2" type="search" name="q" value="{{ request.GET.get('q', '') }}" placeholder="Qidirish...">
             <button class="btn btn-primary" type="submit">Qidirish</button>
         </form>
 
         {% for post in posts %}
             {% include 'blog/post_card.html' %}
-        {% empty %}
+        {% else %}
             <p class="text-muted">Postlar topilmadi.</p>
         {% endfor %}
 
         {% if is_paginated %}
             <nav>
                 <ul class="pagination">
-                    {% if page_obj.has_previous %}
-                        <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.q %}&q={{ request.GET.q|urlencode }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category|urlencode }}{% endif %}">Oldingi</a></li>
+                    {% if page_obj.has_previous() %}
+                        <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number() }}{% if request.GET.q %}&q={{ request.GET.q|urlencode }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category|urlencode }}{% endif %}">Oldingi</a></li>
                     {% endif %}
                     <li class="page-item disabled"><span class="page-link">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span></li>
-                    {% if page_obj.has_next %}
-                        <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.q %}&q={{ request.GET.q|urlencode }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category|urlencode }}{% endif %}">Keyingi</a></li>
+                    {% if page_obj.has_next() %}
+                        <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number() }}{% if request.GET.q %}&q={{ request.GET.q|urlencode }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category|urlencode }}{% endif %}">Keyingi</a></li>
                     {% endif %}
                 </ul>
             </nav>
@@ -32,7 +32,7 @@
         <div class="card">
             <div class="card-header">Kategoriyalar</div>
             <div class="list-group list-group-flush">
-                <a href="{% url 'post_list' %}" class="list-group-item list-group-item-action">Hammasi</a>
+                <a href="{{ url('post_list') }}" class="list-group-item list-group-item-action">Hammasi</a>
                 {% for category in categories %}
                     <a href="?category={{ category.slug }}" class="list-group-item list-group-item-action {% if request.GET.category == category.slug %}active{% endif %}">{{ category.name }}</a>
                 {% endfor %}

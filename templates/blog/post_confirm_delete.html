@@ -5,9 +5,9 @@
     <div class="card-body">
         <h3>"{{ object.title }}" postini o'chirasizmi?</h3>
         <form method="post">
-            {% csrf_token %}
+            {{ csrf_input }}
             <button class="btn btn-danger" type="submit">Ha, o'chirish</button>
-            <a class="btn btn-secondary" href="{{ object.get_absolute_url }}">Yo'q</a>
+            <a class="btn btn-secondary" href="{{ object.get_absolute_url() }}">Yo'q</a>
         </form>
     </div>
 </div>

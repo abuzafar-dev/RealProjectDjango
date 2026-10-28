@@ -1,6 +1,6 @@
-# RealProjectDjango — Blog
+# RealProjectDjango — Blog (Django + Jinja2)
 
-Django'da yozilgan to'liq blog sayti: ro'yxatdan o'tish, kirish, post yozish, izoh qoldirish, qidiruv va kategoriyalar.
+Django'da yozilgan to'liq blog sayti, shablonlar Jinja2 orqali ishlaydi: ro'yxatdan o'tish, kirish, post yozish, izoh qoldirish, qidiruv va kategoriyalar.
 
 ## Quick start
 
@@ -19,6 +19,11 @@ make test    # checks + tests
 - "Mening postlarim" sahifasi
 - Admin panel: kategoriyalar, postlar va izohlar
 - Bootstrap 5 dizayn
+
+## Jinja2 sozlamasi
+
+- `config/settings.py` ichida `TEMPLATES` ga `django.template.backends.jinja2.Jinja2` qo'shilgan (admin panel uchun `DjangoTemplates` ham qoldirilgan)
+- `config/jinja2.py` da `static()`, `url()` va `get_messages()` global qilingan, `date`, `truncatewords`, `linebreaks` filtrlari qo'shilgan
 
 ## Ishga tushirish
 
@@ -40,7 +45,7 @@ http://127.0.0.1:8000/ — sayt, http://127.0.0.1:8000/admin/ — admin panel (k
 accounts/   ro'yxatdan o'tish, login, logout
 blog/       Category, Post, Comment modellari va sahifalar
 templates/  base.html, accounts/, blog/
-config/     sozlamalar
+config/     sozlamalar, Jinja2 environment
 ```
 
 ## Testlar
