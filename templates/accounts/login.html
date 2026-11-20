@@ -1,32 +1,28 @@
 {% extends 'base.html' %}
+{% import 'components/ui.html' as ui %}
 
-{% block title %}Kirish{% endblock %}
+{% block title %}Kirish — Daftar{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-5">
-        <div class="card">
-            <div class="card-body">
-                <h2>Kirish</h2>
-                {% if form.non_field_errors() %}
-                    <div class="alert alert-danger">Login yoki parol xato</div>
-                {% endif %}
-                <form method="post">
-                    {{ csrf_input }}
-                    <input type="hidden" name="next" value="{{ request.GET.get('next', '') }}">
-                    <div class="mb-3">
-                        <label class="form-label">Username</label>
-                        <input class="form-control" type="text" name="username" required>
-                    </div>
-                    <div class="mb-3">
-                        <label class="form-label">Parol</label>
-                        <input class="form-control" type="password" name="password" required>
-                    </div>
-                    <button class="btn btn-primary w-100" type="submit">Kirish</button>
-                </form>
-                <p class="mt-3 mb-0">Akkauntingiz yo'qmi? <a href="{{ url('register') }}">Ro'yxatdan o'ting</a></p>
-            </div>
+<div class="auth">
+    <h1>Xush kelibsiz</h1>
+    <p class="auth__lead">Maqola yozish va izoh qoldirish uchun akkauntingizga kiring.</p>
+    <form method="post" class="panel">
+        {{ csrf_input }}
+        {% if form.non_field_errors() %}
+            <div class="alert alert--error" role="alert">Login yoki parol xato. Qaytadan urinib ko'ring.</div>
+        {% endif %}
+        <input type="hidden" name="next" value="{{ request.GET.get('next', '') }}">
+        <div class="field">
+            <label for="id_username">Login</label>
+            <input class="input" id="id_username" type="text" name="username" value="{{ form.username.value() or '' }}" autocomplete="username" autofocus required>
         </div>
-    </div>
+        <div class="field">
+            <label for="id_password">Parol</label>
+            <input class="input" id="id_password" type="password" name="password" autocomplete="current-password" required>
+        </div>
+        <button class="btn btn--primary btn--block" type="submit">Kirish</button>
+    </form>
+    <p class="auth__foot">Akkauntingiz yo'qmi? <a href="{{ url('register') }}">Ro'yxatdan o'ting</a></p>
 </div>
 {% endblock %}

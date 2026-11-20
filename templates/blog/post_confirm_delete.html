@@ -1,13 +1,17 @@
 {% extends 'base.html' %}
+{% import 'components/ui.html' as ui %}
+
+{% block title %}Postni o'chirish — Daftar{% endblock %}
 
 {% block content %}
-<div class="card">
-    <div class="card-body">
-        <h3>"{{ object.title }}" postini o'chirasizmi?</h3>
-        <form method="post">
+<div class="auth">
+    <div class="panel">
+        <h1 style="font-size: var(--fs-xl)">"{{ object.title }}" postini o'chirasizmi?</h1>
+        <p class="muted">Post va unga yozilgan barcha izohlar butunlay o'chadi. Bu amalni qaytarib bo'lmaydi.</p>
+        <form method="post" class="form-actions">
             {{ csrf_input }}
-            <button class="btn btn-danger" type="submit">Ha, o'chirish</button>
-            <a class="btn btn-secondary" href="{{ object.get_absolute_url() }}">Yo'q</a>
+            <button class="btn btn--danger" type="submit">{{ ui.icon('trash') }} Ha, o'chirish</button>
+            <a class="btn btn--ghost" href="{{ object.get_absolute_url() }}">Yo'q, qolsin</a>
         </form>
     </div>
 </div>

@@ -2,6 +2,8 @@ from django.conf import settings
 from django.db import models
 from django.urls import reverse
 
+from blog.text import plain_excerpt, reading_minutes, render_body
+
 
 class Category(models.Model):
     name = models.CharField(max_length=100, unique=True)
@@ -32,6 +34,18 @@ class Post(models.Model):
 
     def get_absolute_url(self):
         return reverse('post_detail', args=[self.pk])
+
+    @property
+    def reading_minutes(self):
+        return reading_minutes(self.text)
+
+    @property
+    def excerpt(self):
+        return plain_excerpt(self.text)
+
+    @property
+    def body_html(self):
+        return render_body(self.text)
 
 
 class Comment(models.Model):

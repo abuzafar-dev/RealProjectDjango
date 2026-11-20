@@ -1,10 +1,21 @@
 {% extends 'base.html' %}
+{% import 'components/ui.html' as ui %}
+
+{% block title %}Mening postlarim — Daftar{% endblock %}
 
 {% block content %}
-<h2 class="mb-4">Mening postlarim</h2>
-{% for post in posts %}
-    {% include 'blog/post_card.html' %}
-{% else %}
-    <p class="text-muted">Siz hali post yozmagansiz. <a href="{{ url('post_create') }}">Birinchi postni yozing</a></p>
-{% endfor %}
+<header class="page-head toolbar">
+    <div>
+        <h1>Mening postlarim</h1>
+        <p>{{ posts|length }} ta maqola · jami {{ posts|sum(attribute='views') }} marta o'qilgan</p>
+    </div>
+    <a class="btn btn--primary" href="{{ url('post_create') }}">{{ ui.icon('pen') }} Yangi post</a>
+</header>
+<div class="stack">
+    {% for post in posts %}
+        {{ ui.post_card(post, show_author=False) }}
+    {% else %}
+        {{ ui.empty("Siz hali post yozmagansiz", "Bugun o'rgangan bitta narsangizni yozib qo'ying — boshqalarga ham foyda.", url('post_create'), 'Birinchi postni yozing') }}
+    {% endfor %}
+</div>
 {% endblock %}

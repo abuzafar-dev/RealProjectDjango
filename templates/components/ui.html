@@ -1,0 +1,93 @@
+{# Reusable UI pieces. Import with: {% import 'components/ui.html' as ui %} #}
+
+{% macro icon(name, label=None) -%}
+{%- set paths = {
+    'search': '<circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/>',
+    'eye': '<path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/>',
+    'chat': '<path d="M21 12a8 8 0 0 1-11.7 7.1L4 20l1-4.4A8 8 0 1 1 21 12z"/>',
+    'clock': '<circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/>',
+    'pen': '<path d="M4 20h4L19 9l-4-4L4 16v4z"/><path d="m13.5 6.5 4 4"/>',
+    'book': '<path d="M5 4.5A1.5 1.5 0 0 1 6.5 3H19v15H6.5A1.5 1.5 0 0 0 5 19.5z"/><path d="M5 19.5A1.5 1.5 0 0 0 6.5 21H19"/><path d="M9 7h6"/>',
+    'x': '<path d="M6 6l12 12M18 6 6 18"/>',
+    'trash': '<path d="M4 7h16M10 11v6M14 11v6M6 7l1 13h10l1-13M9 7V4h6v3"/>',
+    'arrow-left': '<path d="M19 12H5M11 6l-6 6 6 6"/>',
+    'calendar': '<rect x="4" y="5" width="16" height="15" rx="2"/><path d="M4 10h16M9 3v4M15 3v4"/>',
+} -%}
+<svg class="icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"{% if label %} role="img" aria-label="{{ label }}"{% else %} aria-hidden="true"{% endif %}>{{ paths[name]|safe }}</svg>
+{%- endmacro %}
+
+{% macro avatar(user, size='') -%}
+<span class="avatar{% if size %} avatar--{{ size }}{% endif %}" aria-hidden="true">{{ user|initials }}</span>
+{%- endmacro %}
+
+{% macro post_meta(post, show_author=True) %}
+<div class="meta">
+    {% if show_author %}
+    <span class="meta__item">{{ avatar(post.author) }}<a href="{{ url('author_detail', args=[post.author.username]) }}">{{ post.author|display_name }}</a></span>
+    {% endif %}
+    <span class="meta__item">{{ icon('calendar') }}<time datetime="{{ post.created_at.isoformat() }}">{{ post.created_at|date("d.m.Y") }}</time></span>
+    <span class="meta__item">{{ icon('clock') }}{{ post.reading_minutes }} daqiqa</span>
+    <span class="meta__item" title="Ko'rishlar">{{ icon('eye', "Ko'rishlar") }}{{ post.views }}</span>
+    {% if post.comment_count is defined %}
+    <span class="meta__item" title="Izohlar">{{ icon('chat', 'Izohlar') }}{{ post.comment_count }}</span>
+    {% endif %}
+</div>
+{% endmacro %}
+
+{% macro post_card(post, show_author=True) %}
+<article class="post-card">
+    <div class="post-card__top">
+        {% if post.category %}
+            <a class="badge" href="{{ url('post_list') }}?category={{ post.category.slug }}">{{ post.category.name }}</a>
+        {% else %}
+            <span class="badge badge--neutral">Kategoriyasiz</span>
+        {% endif %}
+    </div>
+    <h2 class="post-card__title"><a href="{{ post.get_absolute_url() }}">{{ post.title }}</a></h2>
+    <p class="post-card__excerpt">{{ post.excerpt }}</p>
+    {{ post_meta(post, show_author) }}
+</article>
+{% endmacro %}
+
+{% macro field(f) %}
+<div class="field{% if f.errors %} has-error{% endif %}">
+    <label for="{{ f.id_for_label }}">{{ f.label }}</label>
+    {{ f.as_widget(attrs={'class': ('input ' ~ f.field.widget.attrs.get('class', '')).strip()}) }}
+    {% for error in f.errors %}<span class="field__error">{{ error }}</span>{% endfor %}
+    {% if f.help_text %}<span class="field__help">{{ f.help_text|safe }}</span>{% endif %}
+</div>
+{% endmacro %}
+
+{% macro form_errors(form) %}
+{% for error in form.non_field_errors() %}<div class="alert alert--error" role="alert">{{ error }}</div>{% endfor %}
+{% endmacro %}
+
+{% macro empty(title, text, action_url=None, action_label=None) %}
+<div class="empty">
+    <svg class="empty__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 4.5A1.5 1.5 0 0 1 6.5 3H19v15H6.5A1.5 1.5 0 0 0 5 19.5z"/><path d="M5 19.5A1.5 1.5 0 0 0 6.5 21H19"/><path d="M9 7h6"/></svg>
+    <h2>{{ title }}</h2>
+    <p>{{ text }}</p>
+    {% if action_url %}<a class="btn btn--primary" href="{{ action_url }}">{{ action_label }}</a>{% endif %}
+</div>
+{% endmacro %}
+
+{% macro pagination(page_obj, params='') %}
+{% if page_obj.paginator.num_pages > 1 %}
+{% set prefix = '?' ~ (params ~ '&' if params else '') %}
+<nav class="pager" aria-label="Sahifalar">
+    {% if page_obj.has_previous() %}
+        <a href="{{ prefix }}page={{ page_obj.previous_page_number() }}" rel="prev">‹ Oldingi</a>
+    {% endif %}
+    {% for num in page_obj.paginator.page_range %}
+        {% if num == page_obj.number %}
+            <span aria-current="page">{{ num }}</span>
+        {% else %}
+            <a href="{{ prefix }}page={{ num }}" aria-label="{{ num }}-sahifa">{{ num }}</a>
+        {% endif %}
+    {% endfor %}
+    {% if page_obj.has_next() %}
+        <a href="{{ prefix }}page={{ page_obj.next_page_number() }}" rel="next">Keyingi ›</a>
+    {% endif %}
+</nav>
+{% endif %}
+{% endmacro %}

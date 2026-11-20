@@ -1,21 +1,18 @@
 {% extends 'base.html' %}
+{% import 'components/ui.html' as ui %}
 
-{% block title %}Ro'yxatdan o'tish{% endblock %}
+{% block title %}Ro'yxatdan o'tish — Daftar{% endblock %}
 
 {% block content %}
-<div class="row justify-content-center">
-    <div class="col-md-6">
-        <div class="card">
-            <div class="card-body">
-                <h2>Ro'yxatdan o'tish</h2>
-                <form method="post">
-                    {{ csrf_input }}
-                    {{ form.as_p() }}
-                    <button class="btn btn-primary w-100" type="submit">Ro'yxatdan o'tish</button>
-                </form>
-                <p class="mt-3 mb-0">Akkauntingiz bormi? <a href="{{ url('login') }}">Kiring</a></p>
-            </div>
-        </div>
-    </div>
+<div class="auth">
+    <h1>Ro'yxatdan o'tish</h1>
+    <p class="auth__lead">Bir daqiqa vaqt oladi. Keyin maqola yozishingiz va izoh qoldirishingiz mumkin.</p>
+    <form method="post" class="panel" novalidate>
+        {{ csrf_input }}
+        {{ ui.form_errors(form) }}
+        {% for f in form %}{{ ui.field(f) }}{% endfor %}
+        <button class="btn btn--primary btn--block" type="submit">Ro'yxatdan o'tish</button>
+    </form>
+    <p class="auth__foot">Akkauntingiz bormi? <a href="{{ url('login') }}">Kiring</a></p>
 </div>
 {% endblock %}
