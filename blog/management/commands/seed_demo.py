@@ -27,6 +27,7 @@ AUTHORS = [
     ('dilnoza', 'Dilnoza', 'Karimova'),
     ('jasur', 'Jasur', 'Toshmatov'),
     ('madina', 'Madina', 'Rahimova'),
+    ('sardor', 'Sardor', 'Aliyev'),
 ]
 
 POSTS = [
@@ -246,6 +247,185 @@ async function postlarniOl() {
 
 `fetch` faqat tarmoq uzilganda xato beradi. 404 yoki 500 javobni `javob.ok` orqali o'zingiz tekshirishingiz kerak — bu boshlovchilar eng ko'p o'tkazib yuboradigan joy.""",
     },
+    {
+        'author': 'sardor', 'category': 'git', 'days_ago': 0, 'views': 64,
+        'title': "Git merge conflict: qo'rqmasdan hal qilish",
+        'text': """Ikki kishi bitta faylning bitta qatorini o'zgartirsa, Git qaysi variant to'g'riligini bilmaydi va sizdan so'raydi. Bu xato emas — oddiy holat.
+
+## Conflict qanday ko'rinadi
+
+```text
+<<<<<<< HEAD
+narx = 25000
+=======
+narx = 30000
+>>>>>>> yangi-narxlar
+```
+
+Yuqoridagi qism — sizning branchingiz, pastdagisi — qo'shilayotgan branch.
+
+## Hal qilish tartibi
+
+```bash
+git status                 # qaysi fayllarda conflict bor
+# faylni ochib, keraksiz qismni va belgilarni o'chiring
+git add narxlar.py
+git commit                 # merge'ni yakunlash
+```
+
+## Kamroq conflict uchun
+
+Kichik va tez-tez commit qiling, ishni boshlashdan oldin `git pull` qiling va bitta faylni bir vaqtda ikki kishi tahrirlamasligini kelishib oling.""",
+    },
+    {
+        'author': 'dilnoza', 'category': 'database', 'days_ago': 4, 'views': 177,
+        'title': "Indeks nima va so'rovlarni qanday tezlashtiradi?",
+        'text': """Kitobning oxiridagi mundarija kabi: kerakli sahifani butun kitobni varaqlamasdan topasiz. Ma'lumotlar bazasidagi indeks ham xuddi shunday ishlaydi.
+
+## Indekssiz
+
+`WHERE username = 'ali'` so'rovi million qatorli jadvalda har bir qatorni tekshiradi.
+
+## Indeks bilan
+
+```sql
+CREATE INDEX idx_user_username ON auth_user (username);
+```
+
+Django'da esa modelning o'zida yoziladi:
+
+```python
+class Post(models.Model):
+    title = models.CharField(max_length=200, db_index=True)
+```
+
+## Har joyga indeks qo'ymang
+
+Indeks o'qishni tezlashtiradi, lekin yozishni sekinlashtiradi va joy egallaydi. Faqat tez-tez qidiriladigan, filtrlanadigan yoki saralanadigan ustunlarga qo'ying. `unique=True` va ForeignKey uchun Django indeksni o'zi yaratadi.""",
+    },
+    {
+        'author': 'madina', 'category': 'karyera', 'days_ago': 6, 'views': 289,
+        'title': "Junior Python intervyusida eng ko'p beriladigan 5 savol",
+        'text': """Intervyuda murakkab algoritmlardan ko'ra asoslarni qanchalik tushunishingiz tekshiriladi. Mana eng ko'p uchraydigan savollar.
+
+## 1. list va tuple farqi
+
+list o'zgaruvchan (mutable), tuple — o'zgarmas. tuple'ni lug'at kaliti sifatida ishlatish mumkin.
+
+## 2. is va == farqi
+
+`==` qiymatni, `is` esa obyekt bir xilligini solishtiradi.
+
+```python
+a = [1, 2]
+b = [1, 2]
+a == b   # True
+a is b   # False
+```
+
+## 3. *args va **kwargs
+
+Funksiyaga noma'lum sondagi oddiy va nomlangan argumentlarni uzatish usuli.
+
+## 4. Dekorator nima
+
+Boshqa funksiyani o'rab, unga qo'shimcha xatti-harakat beradigan funksiya. Django'dagi `@login_required` — eng yaxshi misol.
+
+## 5. GIL haqida
+
+Python'da bir vaqtda faqat bitta thread Python kodini bajaradi. Shuning uchun og'ir hisob-kitoblar uchun multiprocessing ishlatiladi.
+
+Javobni bilmasangiz, "bilmayman, lekin shunday deb o'ylayman" deyish — to'qib gapirishdan ancha yaxshi.""",
+    },
+    {
+        'author': 'sardor', 'category': 'python', 'days_ago': 8, 'views': 143,
+        'title': "try/except: xatolarni to'g'ri ushlash",
+        'text': """Dastur hech qachon xatosiz ishlamaydi: fayl topilmaydi, internet uziladi, foydalanuvchi son o'rniga harf kiritadi. Muhimi — xatoni to'g'ri ushlash.
+
+## Yomon usul
+
+```python
+try:
+    yosh = int(input("Yoshingiz: "))
+except:
+    pass
+```
+
+Bu barcha xatolarni, hatto Ctrl+C ni ham yutib yuboradi va muammo yashirinadi.
+
+## To'g'ri usul
+
+```python
+try:
+    yosh = int(input("Yoshingiz: "))
+except ValueError:
+    print("Iltimos, son kiriting")
+else:
+    print(f"Keyingi yil {yosh + 1} yoshda bo'lasiz")
+```
+
+## Qoida
+
+Faqat kutayotgan va hal qila oladigan xatoni ushlang. `else` bloki xato bo'lmaganda, `finally` esa har doim bajariladi — faylni yopish yoki ulanishni uzish uchun qulay.""",
+    },
+    {
+        'author': 'jasur', 'category': 'django', 'days_ago': 10, 'views': 205,
+        'title': "Funksiya yoki klass: Django view'larni qachon qanday yozish kerak",
+        'text': """Django'da view ikki xil yoziladi: oddiy funksiya (FBV) va klass (CBV). Ikkalasi ham to'g'ri, faqat vaziyatga qarab tanlanadi.
+
+## Funksiya — aniq va oddiy
+
+```python
+@login_required
+def my_posts(request):
+    posts = request.user.posts.all()
+    return render(request, 'blog/my_posts.html', {'posts': posts})
+```
+
+Nima bo'layotgani yuqoridan pastga o'qiladi. Maxsus mantiq ko'p bo'lsa, funksiya qulayroq.
+
+## Klass — tayyor CRUD
+
+```python
+class PostUpdateView(AuthorRequiredMixin, UpdateView):
+    model = Post
+    form_class = PostForm
+```
+
+Ro'yxat, yaratish, tahrirlash, o'chirish kabi standart ishlar ikki-uch qatorda tayyor bo'ladi. Mixin'lar orqali huquq tekshiruvini qayta ishlatish oson.
+
+## Shu blogda
+
+Maqola sahifasi va izoh qo'shish — funksiya, chunki mantiq o'ziga xos. Post yaratish, tahrirlash va o'chirish — klass, chunki ular standart.""",
+    },
+    {
+        'author': 'madina', 'category': 'database', 'days_ago': 14, 'views': 112,
+        'title': "SQLite'dan PostgreSQL'ga: qachon o'tish kerak?",
+        'text': """Django yangi loyihada SQLite'ni tanlaydi va o'rganish uchun bu ajoyib: o'rnatish shart emas, butun baza bitta fayl.
+
+## SQLite qachon yetarli
+
+Shaxsiy loyihalar, prototiplar, testlar va kam foydalanuvchili saytlar uchun.
+
+## PostgreSQL qachon kerak
+
+Bir vaqtda ko'p foydalanuvchi yozganda, katta hajmdagi ma'lumotda, to'liq matnli qidiruv yoki JSON maydonlari kerak bo'lganda.
+
+## Django'da o'tish oson
+
+```python
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'daftar',
+        'USER': 'daftar',
+        'HOST': 'localhost',
+    }
+}
+```
+
+Keyin `python manage.py migrate` — jadvallar yangi bazada yaratiladi. ORM ishlatganingiz uchun kodni o'zgartirish shart emas.""",
+    },
 ]
 
 COMMENTS = [
@@ -259,6 +439,17 @@ COMMENTS = [
     (6, 'dilnoza', "Ayniqsa 'bitta buyruq bilan ishga tushirish' qismi muhim."),
     (6, 'jasur', "Testlar haqidagi fikrga to'liq qo'shilaman."),
     (8, 'madina', 'clean() va clean_<field> farqini ham yozing iltimos.'),
+    (10, 'jasur', 'Birinchi conflict paytida rosa qo\'rqqandim, shu maqola o\'shanda kerak edi.'),
+    (10, 'dilnoza', 'VS Code conflict\'larni rangli ko\'rsatadi, juda qulay.'),
+    (11, 'sardor', "Kitob mundarijasi bilan solishtirish juda tushunarli bo'libdi."),
+    (11, 'madina', 'EXPLAIN buyrug\'i haqida ham yozsangiz bo\'lardi.'),
+    (11, 'dilnoza', "Yaxshi fikr, keyingi maqolada EXPLAIN'ni ko'rsataman."),
+    (12, 'sardor', "Menga intervyuda aynan is va == farqini so'rashgan edi!"),
+    (12, 'jasur', 'Oxirgi maslahat eng muhimi — to\'qib gapirmaslik.'),
+    (12, 'dilnoza', 'Mutable default argument savolini ham qo\'shish mumkin.'),
+    (13, 'madina', "except: pass ni ko'p kodda ko'raman, endi nega yomonligini tushundim."),
+    (14, 'sardor', "Men faqat funksiya yozardim, endi UpdateView'ni sinab ko'raman."),
+    (15, 'jasur', 'Docker bilan PostgreSQL ko\'tarish haqida ham davom ettirsangiz.'),
 ]
 
 
@@ -307,9 +498,8 @@ class Command(BaseCommand):
             if created:
                 comment = Comment.objects.create(post=post, author=authors[username], text=text)
                 published = Post.objects.values_list('created_at', flat=True).get(pk=post.pk)
-                Comment.objects.filter(pk=comment.pk).update(
-                    created_at=published + timedelta(hours=2 + position * 3, minutes=17 * position % 60),
-                )
+                written = published + timedelta(hours=2 + position % 6 * 3, minutes=17 * position % 60)
+                Comment.objects.filter(pk=comment.pk).update(created_at=min(written, now - timedelta(minutes=5)))
                 new_comments += 1
 
         self.stdout.write(self.style.SUCCESS(
