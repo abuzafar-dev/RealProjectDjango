@@ -7,18 +7,26 @@ class PostForm(forms.ModelForm):
     class Meta:
         model = Post
         fields = ['title', 'category', 'text']
-        widgets = {
-            'title': forms.TextInput(attrs={'class': 'form-control'}),
-            'category': forms.Select(attrs={'class': 'form-select'}),
-            'text': forms.Textarea(attrs={'class': 'form-control', 'rows': 8}),
+        labels = {'title': 'Sarlavha', 'category': 'Kategoriya', 'text': 'Matn'}
+        help_texts = {
+            'text': "Bo'sh qator — yangi xatboshi. ## — kichik sarlavha. "
+                    "Kod uchun ```python ... ``` yoki `qisqa kod` ishlating.",
         }
+        widgets = {
+            'title': forms.TextInput(attrs={'placeholder': "Masalan: Django'da birinchi model"}),
+            'text': forms.Textarea(attrs={'rows': 14, 'class': 'is-mono'}),
+        }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['category'].empty_label = 'Kategoriyasiz'
 
 
 class CommentForm(forms.ModelForm):
     class Meta:
         model = Comment
         fields = ['text']
+        labels = {'text': 'Izoh'}
         widgets = {
-            'text': forms.Textarea(attrs={'class': 'form-control', 'rows': 3, 'placeholder': 'Izoh yozing...'}),
+            'text': forms.Textarea(attrs={'rows': 3, 'placeholder': "Fikringiz yoki savolingizni yozing..."}),
         }
-        labels = {'text': ''}

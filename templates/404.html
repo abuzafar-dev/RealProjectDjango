@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+
+{% block title %}Sahifa topilmadi — Daftar{% endblock %}
+
+{% block content %}
+<div class="error-page">
+    <div class="error-page__code">404</div>
+    <h1>Bu sahifa topilmadi</h1>
+    <p>Havola eskirgan yoki maqola o'chirilgan bo'lishi mumkin.</p>
+    <a class="btn btn--primary" href="{{ url('post_list') }}">Maqolalarga qaytish</a>
+</div>
+{% endblock %}

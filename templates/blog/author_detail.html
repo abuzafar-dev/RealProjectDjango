@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+{% import 'components/ui.html' as ui %}
+
+{% block title %}{{ author|display_name }} — Daftar{% endblock %}
+
+{% block content %}
+<header class="page-head">
+    <nav class="crumbs" aria-label="Sahifa yo'li"><a href="{{ url('post_list') }}">Maqolalar</a><span aria-hidden="true">/</span><span>Muallif</span></nav>
+    <div class="profile">
+        {{ ui.avatar(author, 'lg') }}
+        <div>
+            <h1>{{ author|display_name }}</h1>
+            <p>@{{ author.username }} · {{ author.date_joined|date("Y") }}-yildan beri</p>
+        </div>
+        <ul class="stats" aria-label="Muallif statistikasi">
+            <li><strong>{{ posts|length }}</strong><span>maqola</span></li>
+            <li><strong>{{ total_views }}</strong><span>ko'rish</span></li>
+            <li><strong>{{ comment_count }}</strong><span>izoh olgan</span></li>
+        </ul>
+    </div>
+</header>
+<div class="stack">
+    {% for post in posts %}
+        {{ ui.post_card(post, show_author=False) }}
+    {% else %}
+        {{ ui.empty("Hali maqola yo'q", "Bu muallif hali hech narsa yozmagan.") }}
+    {% endfor %}
+</div>
+{% endblock %}

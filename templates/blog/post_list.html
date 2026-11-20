@@ -1,43 +1,103 @@
 {% extends 'base.html' %}
+{% import 'components/ui.html' as ui %}
+
+{% block title %}{% if active_category %}{{ active_category.name }} — {% endif %}Daftar — o'zbek tilida dasturlash maqolalari{% endblock %}
+
+{% block hero %}
+<section class="hero">
+    <div class="container">
+        <p class="eyebrow"><span>//</span>Dasturchilar bloki</p>
+        <h1>Dasturlashni o'zbek tilida o'rganing va o'rgating</h1>
+        <p class="hero__lead">O'zbek tilidagi dasturlash materiallari kam va turli joyga sochilgan. Daftar ularni bir joyga yig'adi: qisqa, amaliy maqolalar, kod misollari va savol-javoblar uchun izohlar.</p>
+        <form class="search" method="get" action="{{ url('post_list') }}" role="search">
+            <label class="search__field">
+                <span class="visually-hidden">Maqolalardan qidirish</span>
+                {{ ui.icon('search') }}
+                <input class="input" type="search" name="q" value="{{ query }}" placeholder="Masalan: Django, git, SQL...">
+            </label>
+            {% if active_category %}<input type="hidden" name="category" value="{{ active_category.slug }}">{% endif %}
+            <button class="btn btn--primary" type="submit">Qidirish</button>
+        </form>
+        <ul class="stats" aria-label="Statistika">
+            <li><strong>{{ stats.posts }}</strong><span>maqola</span></li>
+            <li><strong>{{ stats.authors }}</strong><span>muallif</span></li>
+            <li><strong>{{ stats.comments }}</strong><span>izoh</span></li>
+        </ul>
+    </div>
+</section>
+{% endblock %}
 
 {% block content %}
-<div class="row">
-    <div class="col-md-8">
-        <form class="d-flex mb-4" method="get">
-            <input class="form-control me-2" type="search" name="q" value="{{ request.GET.get('q', '') }}" placeholder="Qidirish...">
-            <button class="btn btn-primary" type="submit">Qidirish</button>
-        </form>
-
-        {% for post in posts %}
-            {% include 'blog/post_card.html' %}
-        {% else %}
-            <p class="text-muted">Postlar topilmadi.</p>
-        {% endfor %}
-
-        {% if is_paginated %}
-            <nav>
-                <ul class="pagination">
-                    {% if page_obj.has_previous() %}
-                        <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number() }}{% if request.GET.q %}&q={{ request.GET.q|urlencode }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category|urlencode }}{% endif %}">Oldingi</a></li>
-                    {% endif %}
-                    <li class="page-item disabled"><span class="page-link">{{ page_obj.number }} / {{ page_obj.paginator.num_pages }}</span></li>
-                    {% if page_obj.has_next() %}
-                        <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number() }}{% if request.GET.q %}&q={{ request.GET.q|urlencode }}{% endif %}{% if request.GET.category %}&category={{ request.GET.category|urlencode }}{% endif %}">Keyingi</a></li>
-                    {% endif %}
-                </ul>
-            </nav>
-        {% endif %}
-    </div>
-    <div class="col-md-4">
-        <div class="card">
-            <div class="card-header">Kategoriyalar</div>
-            <div class="list-group list-group-flush">
-                <a href="{{ url('post_list') }}" class="list-group-item list-group-item-action">Hammasi</a>
-                {% for category in categories %}
-                    <a href="?category={{ category.slug }}" class="list-group-item list-group-item-action {% if request.GET.category == category.slug %}active{% endif %}">{{ category.name }}</a>
-                {% endfor %}
+<div class="layout">
+    <section aria-labelledby="posts-title">
+        <div class="toolbar">
+            <div class="toolbar__info">
+                <h2 id="posts-title" class="visually-hidden">Maqolalar</h2>
+                <span>{{ paginator.count }} ta maqola</span>
+                {% if query %}
+                    <span class="chip">“{{ query }}”<a href="?{% if active_category %}category={{ active_category.slug }}{% endif %}" aria-label="Qidiruvni tozalash">{{ ui.icon('x') }}</a></span>
+                {% endif %}
+                {% if active_category %}
+                    <span class="chip">{{ active_category.name }}<a href="?{% if query %}q={{ query|urlencode }}{% endif %}" aria-label="Kategoriyani tozalash">{{ ui.icon('x') }}</a></span>
+                {% endif %}
             </div>
+            <nav class="tabs" aria-label="Saralash">
+                {% set base = '?' ~ (sort_params ~ '&' if sort_params else '') %}
+                <a href="{{ base }}sort=new" aria-current="{{ 'true' if sort == 'new' else 'false' }}">Yangi</a>
+                <a href="{{ base }}sort=popular" aria-current="{{ 'true' if sort == 'popular' else 'false' }}">Mashhur</a>
+            </nav>
         </div>
-    </div>
+
+        <div class="stack">
+            {% for post in posts %}
+                {{ ui.post_card(post) }}
+            {% else %}
+                {% if is_filtered %}
+                    {{ ui.empty('Hech narsa topilmadi', "Boshqa so'z bilan qidirib ko'ring yoki filtrni tozalang.", url('post_list'), "Barcha maqolalar") }}
+                {% elif request.user.is_authenticated %}
+                    {{ ui.empty("Hali maqola yo'q", 'Birinchi maqolani siz yozing — bilganingiz kimgadir albatta kerak.', url('post_create'), 'Maqola yozish') }}
+                {% else %}
+                    {{ ui.empty("Hali maqola yo'q", "Ro'yxatdan o'ting va birinchi maqolani yozing.", url('register'), "Ro'yxatdan o'tish") }}
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        {% if is_paginated %}{{ ui.pagination(page_obj, page_params) }}{% endif %}
+    </section>
+
+    <aside class="sidebar" aria-label="Qo'shimcha">
+        {% if categories %}
+        <div class="panel">
+            <h2 class="panel__title">Kategoriyalar</h2>
+            <ul class="cat-list">
+                <li><a href="{{ url('post_list') }}{% if query %}?q={{ query|urlencode }}{% endif %}" aria-current="{{ 'false' if active_category else 'true' }}">Hammasi <span>{{ stats.posts }}</span></a></li>
+                {% for category in categories %}
+                    <li><a href="?category={{ category.slug }}{% if query %}&q={{ query|urlencode }}{% endif %}" aria-current="{{ 'true' if active_category and active_category.pk == category.pk else 'false' }}">{{ category.name }} <span>{{ category.post_count }}</span></a></li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        {% if popular %}
+        <div class="panel">
+            <h2 class="panel__title">Ko'p o'qilgan</h2>
+            <ol class="rank-list">
+                {% for item in popular %}
+                    <li><div><a href="{{ item.get_absolute_url() }}">{{ item.title }}</a><small>{{ item.views }} marta o'qilgan</small></div></li>
+                {% endfor %}
+            </ol>
+        </div>
+        {% endif %}
+
+        <div class="panel panel--accent">
+            <h2 class="panel__title">Muallif bo'ling</h2>
+            <p>Bugun o'rgangan narsangizni yozing. Tushuntirish — eng yaxshi o'rganish usuli.</p>
+            {% if request.user.is_authenticated %}
+                <a class="btn btn--block" href="{{ url('post_create') }}">{{ ui.icon('pen') }} Maqola yozish</a>
+            {% else %}
+                <a class="btn btn--block" href="{{ url('register') }}">Ro'yxatdan o'tish</a>
+            {% endif %}
+        </div>
+    </aside>
 </div>
 {% endblock %}

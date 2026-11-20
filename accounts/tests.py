@@ -26,3 +26,19 @@ class AccountsTests(TestCase):
         self.client.post(reverse('logout'))
         response = self.client.get(reverse('post_create'))
         self.assertEqual(response.status_code, 302)
+
+    def test_register_errors_are_in_uzbek(self):
+        User.objects.create_user('band', password='Kuchli_parol_123')
+        response = self.client.post(reverse('register'), {
+            'username': 'band', 'email': 'yaroqsiz', 'password1': '123', 'password2': '123',
+        })
+        self.assertContains(response, 'Bu login band')
+        self.assertContains(response, "Email noto&#39;g&#39;ri")
+        self.assertContains(response, 'Parol juda qisqa')
+        self.assertContains(response, 'faqat raqamlardan')
+        self.assertNotContains(response, 'This password')
+
+    def test_wrong_password_shows_error(self):
+        User.objects.create_user('vali', password='Kuchli_parol_123')
+        response = self.client.post(reverse('login'), {'username': 'vali', 'password': 'xato'})
+        self.assertContains(response, 'Login yoki parol xato')

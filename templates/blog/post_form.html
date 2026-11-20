@@ -1,15 +1,28 @@
 {% extends 'base.html' %}
+{% import 'components/ui.html' as ui %}
+
+{% block title %}{% if object %}Postni tahrirlash{% else %}Yangi post{% endif %} — Daftar{% endblock %}
 
 {% block content %}
-<div class="card">
-    <div class="card-body">
-        <h2>{% if object %}Postni tahrirlash{% else %}Yangi post{% endif %}</h2>
-        <form method="post">
-            {{ csrf_input }}
-            {{ form.as_p() }}
-            <button class="btn btn-primary" type="submit">Saqlash</button>
-            <a class="btn btn-secondary" href="{% if object %}{{ object.get_absolute_url() }}{% else %}{{ url('post_list') }}{% endif %}">Bekor qilish</a>
-        </form>
-    </div>
+<div class="form-card">
+    <header class="page-head">
+        <nav class="crumbs" aria-label="Sahifa yo'li">
+            {% if object %}<a href="{{ object.get_absolute_url() }}">{{ ui.icon('arrow-left') }}</a><a href="{{ object.get_absolute_url() }}">Maqolaga qaytish</a>
+            {% else %}<a href="{{ url('my_posts') }}">Mening postlarim</a>{% endif %}
+        </nav>
+        <h1>{% if object %}Postni tahrirlash{% else %}Yangi post{% endif %}</h1>
+        <p>{% if object %}O'zgarishlar saqlangach darhol ko'rinadi.{% else %}Bir mavzu, aniq misol, qisqa tushuntirish — yaxshi maqolaning siri shu.{% endif %}</p>
+    </header>
+    <form method="post" class="panel" novalidate>
+        {{ csrf_input }}
+        {{ ui.form_errors(form) }}
+        {{ ui.field(form.title) }}
+        {{ ui.field(form.category) }}
+        {{ ui.field(form.text) }}
+        <div class="form-actions">
+            <button class="btn btn--primary" type="submit">Saqlash</button>
+            <a class="btn btn--ghost" href="{% if object %}{{ object.get_absolute_url() }}{% else %}{{ url('post_list') }}{% endif %}">Bekor qilish</a>
+        </div>
+    </form>
 </div>
 {% endblock %}

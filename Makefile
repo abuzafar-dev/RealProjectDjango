@@ -1,12 +1,21 @@
-.PHONY: help install run test migrate
+.PHONY: help install run test migrate seed demo
 
 help:
 	@echo "make run      — serverni ishga tushirish (http://127.0.0.1:8000/)"
+	@echo "make demo     — demo maqolalar qo'shib, serverni ishga tushirish"
+	@echo "make seed     — demo maqolalar, mualliflar va izohlar qo'shish"
 	@echo "make migrate  — migratsiyalar"
 	@echo "make test     — testlar"
 	@echo "make install  — .venv va kutubxonalar"
 
 run: migrate
+	@echo "==> http://127.0.0.1:8000/"
+	$(PY) manage.py runserver 127.0.0.1:8000
+
+seed: migrate
+	$(PY) manage.py seed_demo
+
+demo: seed
 	@echo "==> http://127.0.0.1:8000/"
 	$(PY) manage.py runserver 127.0.0.1:8000
 
